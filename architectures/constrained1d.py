@@ -15,7 +15,7 @@ class Bubble(torch.nn.Module):
 
 class HardConstrained1dPinn(torch.nn.Module):
     def __init__(self, number_of_blocks, block_width, number_of_outputs,
-                 initial_profile, interpolator_sigma=0.1, time_bubble_beta=2.0):
+                 initial_profile, time_bubble_beta=2.0):
         super().__init__()
         self.bubble = Bubble()
         self.z_predictor = pinn1d.Wang2020(
@@ -31,9 +31,12 @@ class HardConstrained1dPinn(torch.nn.Module):
         for x_ndx in range(len(xs)):
             x = xs[x_ndx]
             xy_list.append((x, self.initial_profile[x_ndx]))
-        self.initial_profile_interpolator = interpolation1d.SumOfGaussians(xy_list, interpolator_sigma)
+        #self.initial_profile_interpolator = interpolation1d.SumOfGaussians(xy_list, sigma_ratio=0.5)
+        self.initial_profile_interpolator = interpolation1d.CubicSpline(
+            xy_list, boundary_condition='2nd_derivative_0'
+        )
 
-        self.time_bubble_beta = torch.nn.Parameter(torch.tensor(time_bubble_beta))
+        self.time_bubble_beta = torch.nn.Parameter(torch.tensor([time_bubble_beta]))
 
     def forward(self, x_t):  # x_t.shape = (B, 2)
         x_tsr = x_t[:, 0].unsqueeze(1)  # (B, 1)
