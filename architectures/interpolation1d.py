@@ -118,6 +118,8 @@ class Spline1d(abc.ABC):
         indices = torch.clamp(indices, min=0, max=self.coefs.shape[0] - 1)
         coefs_tsr = torch.tensor(self.coefs).to(x_tsr.device)
         batch_coefs = coefs_tsr[indices.squeeze(), :]  # (B, d + 1)
+        if len(batch_coefs.shape) == 1:  # B=1 was collapsed by squeeze(): Add a dummy batch dimension
+            batch_coefs = batch_coefs.unsqueeze(0)  # (1, d + 1)
         y_tsr = torch.zeros_like(x_tsr)  # (B, 1)
         for p in range(degree + 1):  # 0, 1, ..., d
             coefs_col = degree - p  # ..., 3, 2, 1, 0
