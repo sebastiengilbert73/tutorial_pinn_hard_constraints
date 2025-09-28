@@ -1,0 +1,11 @@
+python ./train.py ^
+	--outputDirectory="./output_train" ^
+	--randomSeed=0 ^
+	--initialProfile="./smooth_heated_segments.csv" ^
+	--architecture="HardConstrained1dResNet_3_32_1_0.5" ^
+	--startingNeuralNetwork="none" ^
+	--duration=10.0 ^
+	--alpha=0.0001 ^
+	--scheduleFilepath="./schedule_3x10k.csv" ^
+	--numberOfDiffEquResPoints=32768 ^
+	--displayResults
